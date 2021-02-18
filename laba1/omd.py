@@ -24,7 +24,7 @@ def asking_questions(question: str, answer1: str, answer2: str):
 	options = {answer1: True, answer2: False}
 	while option not in options:
 		print('Выберите: {}/{}'.format(*options))
-		option = input()
+		option = input("Ваш ответ: ")
 	number_question += 1
 	if options[option]:
 		return True
@@ -70,7 +70,7 @@ def step_bus():													#4
 def step_join():												#5
 	global result
 	question = "\n{}. Может тогда им объединиться с семьей {} и поехать в их minivan'е?\n".format(number_question, second_family)
-	if asking_questions(question, 'да', 'не'):
+	if asking_questions(question, 'да', 'нет'):
 		result += "Семья поедет вместе с семьей {}. ".format(second_family)
 		return step_rent()				#9
 	return step_bus()					#4
@@ -90,6 +90,7 @@ def step_lifeline():											#6
 
 def step_availability():										#7
 	global result
+	global ussing_pre_word
 	question = "\n{}. А есть ли он дома? Или его нужно покупать?\n".format(number_question)
 	if asking_questions(question, 'купить', 'есть'):
 		if ussing_pre_word:
@@ -128,9 +129,9 @@ def step_hotel():
 	global result
 	question = "\n{}. Стоит ли снимать отель?\n".format(number_question)
 	if asking_questions(question, 'конечно', 'нет'):
-		result += " Будут снимать номер в отеле."
+		result += "\nБудут снимать номер в отеле."
 		return step_flippers()			#3
-	print("Семье негде будет ночевать. С такими планами поездка отменяется. Дети расстроены.")
+	print("\n\nСемье негде будет ночевать. С такими планами поездка отменяется. Дети расстроены.")
 	return False						#выход
 
 
