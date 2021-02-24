@@ -96,6 +96,7 @@ def step_availability():										#7
 		if ussing_pre_word:
 			result += "."
 		result += " Еще необходимо купить надувной плот в магазине."
+		return True
 	if not ussing_pre_word:
 		result += pre_word
 		ussing_pre_word = True
