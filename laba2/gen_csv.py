@@ -1,14 +1,17 @@
 from faker import Faker
 import random
+import os
 
-list_joke_string = [	'Это не число. Попробуй снова:',
+list_joke_string 	= [	'Это не число. Попробуй снова:',
 						'Ну вот опять: ну не число это. Понимаешь? НЕ ЧИСЛО! Давай по новой:',
 						'Никогда такого не было, и вот опять... Ты смеешься?',
 						'Ну всё! Крайний шаг: перевожу на китайский!',
 						'Выйди и зайди нормально!']
-count_joke_moment = 5
-joke = False
-list_departments = []
+count_joke_moment 	= 5
+joke 				= False
+list_departments 	= []
+file_name 			= 'test.csv'
+new_file_name 		= 'test-old.csv'
 
 
 def get_count_departments() -> int:
@@ -27,9 +30,9 @@ def get_count_departments() -> int:
 			if (count_departments > 0 and count_departments < 10):
 				return count_departments
 			else:
-				print("Давай число будет от 1 до 9... А то что это за фирма?)\n")
+				print("Давай это число будет от 1 до 9... А то что это за фирма такая?)\n")
 		except ValueError:
-			print("{}\t{}\n".format(count_joke_moment, list_joke_string.pop(0)))
+			print("{}\n".format(list_joke_string.pop(0)))
 			if count_joke_moment == 2:
 				joke = True
 			elif count_joke_moment == 1:
@@ -50,15 +53,29 @@ try:
 		list_departments.append(fake.bs())
 	
 	"""основная генерация данных"""
-	for i in range(random.randint(100,140)):
-		list_param = (
-			fake.name(),
-			fake.job(),
-			random.choice(list_departments),
-			str(fake.random_int(min=1, max=5)),
-			str(fake.random_int(min=25000, max=150000, step=500))
-		)
-		print(';'.join(list_param))
+	if os.path.exists(file_name):
+		os.rename(file_name, new_file_name)
+		print("\nДля сохранения предыдущих результатов, имеющийся файл {} был переименован в {}.".format(file_name, new_file_name))
+
+	file = open(file_name,'w')
+	if file:
+		current_count_record = random.randint(100,140)
+		for i in range(current_count_record):
+			list_param = (
+				fake.name(),
+				fake.job(),
+				random.choice(list_departments),
+				str(fake.random_int(min=1, max=5)),
+				str(fake.random_int(min=25000, max=150000, step=500))
+			)
+			file.write(';'.join(list_param)+'\n')
+
+		file.close()
+		print("\nУспешно создан файл {} с количеством записей: {}".format(file_name, current_count_record))
+		print("\n" + "="*50 + "\nДо встречи, бро!\nNikel, 2021")
+		exit(0)
+
+	print("Не удалось открыть файл. Программа завершается."+ "="*50 + "\nДо встречи, бро!\nNikel, 2021")
 
 	
 except KeyboardInterrupt:
