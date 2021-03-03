@@ -8,10 +8,11 @@ list_joke_string 	= [	'Это не число. Попробуй снова:',
 						'Ну всё! Крайний шаг: перевожу на китайский!',
 						'Выйди и зайди нормально!']
 count_joke_moment 	= 5
-joke 				= False
+joke 			= False
 list_departments 	= []
-file_name 			= 'test.csv'
+file_name 		= 'test.csv'
 new_file_name 		= 'test-old.csv'
+finaly_word 		= "="*50 + "\nДо встречи, бро!\nNikel, 2021"
 
 
 def get_count_departments() -> int:
@@ -44,10 +45,9 @@ try:
 	print("="*50,"\nГенератор CSV-файлов 3000.\nПредназначен для генерации CSV-файлов, использующихся для тестирования.\nРазработчик: Nikel, М30-117М-20\n2021 Moscow.\n"+"="*50, "\n")
 
 	count_departments = get_count_departments()
+	fake = Faker('ru_RU')					#инициализация генератора
 	if joke:
 		fake = Faker('zh_CN')				#инициализация ржачного генератора
-	else:
-		fake = Faker('ru_RU')				#инициализация генератора
 
 	for i in range(count_departments):
 		list_departments.append(fake.bs())
@@ -57,26 +57,25 @@ try:
 		os.rename(file_name, new_file_name)
 		print("\nДля сохранения предыдущих результатов, имеющийся файл {} был переименован в {}.".format(file_name, new_file_name))
 
-	file = open(file_name,'w')
-	if file:
-		current_count_record = random.randint(100,140)
-		for i in range(current_count_record):
+	file = open(file_name,'w')	
+	if file:								#проверка на возможность создать файл
+		count_record_in_new_file = random.randint(100,140)
+		for i in range(count_record_in_new_file):
 			list_param = (
-				fake.name(),
-				fake.job(),
-				random.choice(list_departments),
-				str(fake.random_int(min=1, max=5)),
-				str(fake.random_int(min=25000, max=150000, step=500))
+				fake.name(),											#ФИО
+				fake.job(),												#должность
+				random.choice(list_departments),						#принадлежность к одному из подразделений
+				str(fake.random_int(min=1, max=5)),						#квартальная оценка
+				str(fake.random_int(min=25000, max=150000, step=500))	#текущая зарплата
 			)
 			file.write(';'.join(list_param)+'\n')
 
 		file.close()
-		print("\nУспешно создан файл {} с количеством записей: {}".format(file_name, current_count_record))
-		print("\n" + "="*50 + "\nДо встречи, бро!\nNikel, 2021")
+		print("\nУспешно создан файл {} с количеством записей: {}\n{}".format(file_name, count_record_in_new_file, finaly_word))
 		exit(0)
 
-	print("Не удалось открыть файл. Программа завершается."+ "="*50 + "\nДо встречи, бро!\nNikel, 2021")
-
+	print("Не удалось открыть/создать файл. Программа завершается." + finaly_word)
+	exit(0)
 	
 except KeyboardInterrupt:
-	print("\033A\n\n" + "="*50 + "\nДо встречи, бро!\nNikel, 2021")
+	print("\033A\n\n" + finaly_word)
