@@ -59,6 +59,8 @@ try:
 
 	file = open(file_name,'w')	
 	if file:								#проверка на возможность создать файл
+		#tmp = ("ФИО", "Должность", "Подразделение", "Квартальная оценка", "Зарплата")
+		#file.write(';'.join(tmp)+'\n')
 		count_record_in_new_file = random.randint(100,140)
 		for i in range(count_record_in_new_file):
 			list_param = (
