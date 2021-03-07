@@ -13,7 +13,7 @@ list_departments 	= []
 file_name 		= 'test.csv'
 new_file_name 		= 'test-old.csv'
 finaly_word 		= "="*50 + "\nДо встречи, бро!\nNikel, 2021"
-
+separator = ';'
 
 def get_count_departments() -> int:
 	"""функция получения количества отделов
@@ -60,7 +60,7 @@ try:
 	file = open(file_name,'w')	
 	if file:								#проверка на возможность создать файл
 		#tmp = ("ФИО", "Должность", "Подразделение", "Квартальная оценка", "Зарплата")
-		#file.write(';'.join(tmp)+'\n')
+		#file.write(separator.join(tmp)+'\n')
 		count_record_in_new_file = random.randint(100,140)
 		for i in range(count_record_in_new_file):
 			list_param = (
@@ -70,7 +70,7 @@ try:
 				str(fake.random_int(min=1, max=5)),						#квартальная оценка
 				str(fake.random_int(min=25000, max=150000, step=500))	#текущая зарплата
 			)
-			file.write(';'.join(list_param)+'\n')
+			file.write(separator.join(list_param)+'\n')
 
 		file.close()
 		print("\nУспешно создан файл {} с количеством записей: {}\n{}".format(file_name, count_record_in_new_file, finaly_word))

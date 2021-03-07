@@ -3,7 +3,7 @@ import numpy
 
 input_file_name 	= 'test.csv'
 finaly_word 		= "="*50 + "\nДо встречи, бро!\nNikel, 2021"
-menu 				= """==================Меню=действий===================
+menu 			= """==================Меню=действий===================
 Меню действий:
 	1. Вывести все отделы
 	2. Вывести сводный отчёт по отделам
@@ -12,6 +12,7 @@ menu 				= """==================Меню=действий===================
 	5. Выйти из программы\n"""+"="*50
 
 output_data = ""
+separator = ';'
 
 """функция получения списка из значений "ячеек" по строкам из файла"""
 def get_str_from_file(name_file: str) -> list:
@@ -19,7 +20,7 @@ def get_str_from_file(name_file: str) -> list:
 	with open(name_file, 'r') as file:
 		for n, line in enumerate(file, 1):
 			line = line.rstrip('\n')
-			str_from_file.append(line.split(';'))
+			str_from_file.append(line.split(separator))
 	return str_from_file
 
 """функция получения списка только уникальных значений из списка отделов"""
@@ -34,7 +35,7 @@ def get_list_data_department(name_file: str, department: str) -> list:
 	with open(name_file, 'r') as file:
 		for n, line in enumerate(file, 1):
 			line = line.rstrip('\n')
-			tmp = line.split(';')
+			tmp = line.split(separator)
 			if tmp[2] == department:
 				out_list.append([tmp[0], tmp[3], tmp[4]])
 	return out_list
@@ -43,7 +44,6 @@ def get_list_data_department(name_file: str, department: str) -> list:
 def asking_questions(question: str, answer1: str, answer2: str) -> bool:
 	global number_question
 	print(question)
-	option = ''
 	options = {answer1: True, answer2: False}
 	while option not in options:
 		print('\tВыберите: {}/{}'.format(*options))
@@ -67,7 +67,7 @@ def print_report():
 	print("*********Вывод*сводного*отчета*по*отделам*********\n")
 	output_data += (f"Отчёт по файлу {input_file_name}\n")
 	tmp = (f"Название отдела", "Численность", "min-max зарплата", "Средняя зарплата")
-	output_data += (';'.join(tmp)+'\n')
+	output_data += (separator.join(tmp)+'\n')
 	for n, department in enumerate(get_unique_list_department(input_file_name), 1):
 		count_worker = 0
 		list_salary = []
@@ -80,7 +80,7 @@ def print_report():
 		average_salary = str(int(numpy.average(list_salary)))
 
 		print("Название {} отдела: {}\n\tЧисленность: {}\n\tДиапазон зарплат: {}\n\tСредняя зарплата: {}\n".format(
-			n, 						#номер отдела
+			n, 					#номер отдела
 			department, 			#название
 			count_worker,			#численность
 			fork_salary,			#min-max
@@ -88,7 +88,7 @@ def print_report():
 			)
 		)
 		tmp = (department, str(count_worker), fork_salary, average_salary)
-		output_data += (';'.join(tmp)+'\n')
+		output_data += (separator.join(tmp)+'\n')
 
 	
 """функция сохранения сводного отчета в CSV-файл"""
@@ -123,7 +123,6 @@ def change_file_name():
 			break
 		print("\n\t\t!!!ВНИМАНИЕ!!!\nТакого файла не существует. Проверьте правильность ввода.\n")
 
-
 try:
 	print("="*50,"\nПарсер CSV-файлов 3000.\nПредназначен для анализа CSV-файлов.\nРазработчик: Nikel, М30-117М-20\n2021 Moscow.\n"+"="*50, "\n")
 	action_code = 0
@@ -145,11 +144,6 @@ try:
 			print("*"*50,"\n")
 		except ValueError:
 			print("Вы ввели не число. Попробуйте снова.\n")
-		
-
-
-
-	
 
 except KeyboardInterrupt:
 	print("\033A\n\n" + finaly_word)
