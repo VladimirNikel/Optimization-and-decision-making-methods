@@ -182,6 +182,7 @@ def step_availability(number_question: int):
 if __name__ == "__main__":
     try:
         print("="*50, "\nOh My Duck\nРазработчик: Nikel, М30-117М-20\n2021 Moscow.\n"+"="*50, "\n")
+        final_phrase = "="*50 + "\nДо встречи, бро!\nNikel, 2021 "
         first_fam = generating_family_name()
         second_fam = generating_family_name(first_fam)
         history_message = """
@@ -191,8 +192,8 @@ if __name__ == "__main__":
 """.format(first_fam)
         print(history_message)
         if step_car(second_fam):
-            print("\n\n" + "="*50 + "\n" + result + "\n" + "="*50 + "\nДо встречи, бро!\nNikel, 2021 ")
+            print("\n\n" + "="*50 + "\n" + result + "\n" + final_phrase)
         else:
-            print("")
+            print("\n\n" + "="*50 + "\nИтог: Семья не едет на отдых.\n" + final_phrase)
     except KeyboardInterrupt:
-        print("\033A\n\n" + "="*50 + "\nДо встречи, бро!\nNikel, 2021 ")
+        print("\033A\n\n" + final_phrase)
