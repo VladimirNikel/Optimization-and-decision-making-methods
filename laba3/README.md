@@ -68,7 +68,8 @@ def encode(message: str) -> str:
 Для выполнения доктестов, описанных в коде необходимо выполнить следующий код:
 
 ```bash
-$ python3 -m doctest -o NORMALIZE_WHITESPACE -v ./morse/morse.py
+$ cd morse
+$ python3 -m doctest -o NORMALIZE_WHITESPACE -v morse.py
 ```
 
 Результаты выполнения указанной команды отображены в файле `doctest_result.md`.
@@ -133,7 +134,8 @@ def test_decode(s, exp):
 Чтобы выполнить тестирование при помощи библиотеки `pytest` необходимо выполнить команду:
 
 ```bash
-pytest ./morse/morse_test.py
+$ cd morse
+$ pytest morse_test.py
 ```
 
 Результаты выполнения теста сведены в файл `paramtest_result.md`.
@@ -144,9 +146,9 @@ pytest ./morse/morse_test.py
 
 ## issue-03
 <details>
-<summary>Подробности</summary>
+<summary>Задание</summary>
 
-Дана функция, кодирующая значение в бинарное представление на основе порядкового номера первого встречаемго элемента\
+Дана функция, кодирующая значение в бинарное представление на основе порядкового номера первого встречаемого элемента\
 Подробнее про `One Hot Encoding` можно прочитать тут - [How to One Hot Encode Sequence Data in Python](https://machinelearningmastery.com/how-to-one-hot-encode-sequence-data-in-python/)
 
 ```python
@@ -189,8 +191,49 @@ def fit_transform(*args: str) -> List[Tuple[str, List[int]]]:
 * файл *.py с функцией и тестами
 * нет замечаний от `flake8`
 </details>
+
 <details>
 <summary>Выполнение</summary>
+
+Был написан файл, используемый для тестирования.
+```python
+# подробности в файле unitTestOneHotEncoder.py
+import unittest
+import one_hot_encoder
+
+class MyTestCase(unittest.TestCase):
+    def test_simple_sequence(self):
+        ...
+        self.assertEqual(correct_answer, answer_test_words)
+
+    def test_with_one_repeat(self):
+        ...
+        self.assertIn(correct_answer[2], answer_test_words)
+        self.assertEqual(correct_answer, answer_test_words)
+
+    def test_with_multiple_repeats(self):
+        ...
+        self.assertEqual(correct_answer, answer_test_words)
+
+    def test_empty_args(self):
+        with self.assertRaises(TypeError):
+            one_hot_encoder.fit_transform()
+
+
+if __name__ == '__main__':
+    unittest.main()
+```
+
+Как видно из приведенного кода, в процессе тестирования выполняется 4 теста, в одном из которых присутствуют два метода проверки, также, есть тест на перехват исключения.
+
+Чтобы выполнить тестирование при помощи библиотеки `unittest` необходимо выполнить команду:
+
+```bash
+$ cd OneHotEncoder
+$ python3 -m unittest -v unitTestOneHotEncoder.py
+```
+
+Результат выполнения тестирования приведен в файле `unittest_result.md`.
 
 </details>
 
@@ -200,7 +243,7 @@ def fit_transform(*args: str) -> List[Tuple[str, List[int]]]:
 <details>
 <summary>Подробности</summary>
 
-Дана функция, кодирующая значение в бинарное представление на основе порядкового номера первого встречаемго элемента\
+Дана функция, кодирующая значение в бинарное представление на основе порядкового номера первого встречаемого элемента\
 Подробнее про `One Hot Encoding` можно прочитать тут - [How to One Hot Encode Sequence Data in Python](https://machinelearningmastery.com/how-to-one-hot-encode-sequence-data-in-python/)
 
 ```python
@@ -245,6 +288,44 @@ def fit_transform(*args: str) -> List[Tuple[str, List[int]]]:
 
 <details>
 <summary>Выполнение</summary>
+
+Был написан файл для тестирования при помощи pytest.
+```python
+# подробности в файле pyTestOneHotEncoder.py
+import pytest
+import one_hot_encoder
+
+
+def test_simple_sequence():
+    ...
+    assert answer_test_words == correct_answer
+
+
+def test_with_one_repeat():
+    ...
+    assert answer_test_words == correct_answer
+
+
+def test_with_multiple_repeats():
+    ...
+    assert answer_test_words == correct_answer
+
+
+def test_empty_args():
+    with pytest.raises(TypeError):
+        one_hot_encoder.fit_transform()
+```
+
+Как видно из приведенного кода, в процессе тестирования выполняется 4 теста, также, есть тест на перехват исключения.
+
+Чтобы выполнить тестирование при помощи библиотеки `pytest` необходимо выполнить команду:
+
+```bash
+$ cd OneHotEncoder
+$ python3 -m pytest pyTestOneHotEncoder.py
+```
+
+Результат выполнения тестирования приведен в файле `pyTest_result.md`.
 
 </details>
 

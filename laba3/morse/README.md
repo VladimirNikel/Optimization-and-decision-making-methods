@@ -70,7 +70,7 @@ def encode(message: str) -> str:
 Для выполнения доктестов, описанных в коде необходимо выполнить следующий код:
 
 ```bash
-$ python3 -m doctest -o NORMALIZE_WHITESPACE -v ./morse/morse.py
+$ python3 -m doctest -o NORMALIZE_WHITESPACE -v morse.py
 ```
 
 Результаты выполнения указанной команды отображены в файле `doctest_result.md`.
@@ -135,7 +135,7 @@ def test_decode(s, exp):
 Чтобы выполнить тестирование при помощи библиотеки `pytest` необходимо выполнить команду:
 
 ```bash
-pytest ./morse/morse_test.py
+pytest morse_test.py
 ```
 
 Результаты выполнения теста сведены в файл `paramtest_result.md`.
