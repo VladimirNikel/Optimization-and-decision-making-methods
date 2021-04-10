@@ -367,7 +367,7 @@ def what_is_year_now() -> int:
 <details>
 <summary>Definition of Done</summary>
 
-**DoD (Definition of Done) - критерии, позволяющие понять, что задача сделана, как ожидается**и:
+**DoD (Definition of Done) - критерии, позволяющие понять, что задача сделана, как ожидается**:
 * добейтесь 100% покрытия кода тестами
 * используйте unittest.mock для замены реального обращения к API
 * предоставьте отчет о покрытии в виде директории с html файлами
@@ -379,6 +379,71 @@ def what_is_year_now() -> int:
 
 <details>
 <summary>Выполнение</summary>
+
+Был написан файл, содержащий тесты, с различными вариантами передачи даты в запросе.
+```python
+# полная версия кода приведена в файле testWhatIsYearNow.py
+import pytest
+import what_is_year_now
+from unittest.mock import patch, MagicMock
+
+
+@patch('urllib.request.urlopen')
+def test_format_v1(urlopen):
+    mock = MagicMock()
+    mock.read.return_value = '{"$id":"1",\
+        "currentDateTime":"2021-04-09T19:29Z",\
+        ... \
+        "serviceResponse":null}'
+    mock.__enter__.return_value = mock
+    urlopen.return_value = mock
+
+    year = what_is_year_now.what_is_year_now()
+    assert year == 2021
+
+
+@patch('urllib.request.urlopen')
+def test_format_v2(urlopen):
+    mock = MagicMock()
+    mock.read.return_value = '{"$id":"1",\
+        "currentDateTime":"09.04.2021T19:29Z",\
+        ... \
+        "serviceResponse":null}'
+    mock.__enter__.return_value = mock
+    urlopen.return_value = mock
+
+    year = what_is_year_now.what_is_year_now()
+    assert year == 2021
+
+
+@patch('urllib.request.urlopen')
+def test_exception_format(urlopen):
+    mock = MagicMock()
+    mock.read.return_value = '{"$id":"1",\
+        "currentDateTime":"2021/04/09T19:29Z",\
+        ... \
+        "serviceResponse":null}'
+    mock.__enter__.return_value = mock
+    urlopen.return_value = mock
+
+    with pytest.raises(Exception):
+        what_is_year_now.what_is_year_now()
+```
+
+Чтобы увидеть процентное отношение покрытия кода тестами, необходимо выполнить команду:
+```bash
+$ cd WhatIsYearNow
+$ python3 -m pytest --cov . testWhatIsYearNow.py
+```
+
+Чтобы сформировать HTML-отчет по покрытию тестами, необходимо выполнить команду:
+
+```bash
+$ cd WhatIsYearNow
+$ python3 -m pytest --cov . --cov-report=html testWhatIsYearNow.py
+```
+
+Результат выполнения команд приведен в файле `result.md`.
 
 </details>
 
@@ -396,3 +461,4 @@ def what_is_year_now() -> int:
 - Установленные **модули**:
 	+ **Flake8** `sudo pip3 install flake8`
 	+ **pytest** `sudo pip3 install pytest`
+	+ **pytest-cov** `sudo pip3 install pytest-cov`
