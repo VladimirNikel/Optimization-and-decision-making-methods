@@ -2,12 +2,21 @@ import json
 import keyword
 
 
-class Advert:
+class ColorizeMixin:
+    repr_color_code = 33    # Yellow
+
+    def __repr__(self):
+        return f'\033[1;{self.repr_color_code};40m' \
+               f'{self.title} | {self.price} ₽' \
+               f'\033[0;1;1m'
+
+
+class Advert(ColorizeMixin):
     _price = 0
 
     def __setattr__(self, key, value):
         if keyword.iskeyword(key):
-            key = key + "_key_"
+            key = key + "_"
         super.__setattr__(self, key, value)
 
     @property
@@ -43,18 +52,21 @@ if __name__ == "__main__":
         lesson_str = """{
             "title": "iPhone X", 
             "price": 100,
+            "class": "smartphone",
             "location": {
                 "address": "город Самара, улица Мориса Тореза, 50",
                 "metro_stations": ["Спортивная", "Гагаринская"]
             }
         }"""
+
         lesson = json.loads(lesson_str)
-        print(lesson)
         temp_unit = json_to_object(lesson, Advert)
         print(temp_unit)
         print(temp_unit.title)
+        print(temp_unit.class_)
         print(temp_unit.location.address)
         print(temp_unit.location.metro_stations)
         print(temp_unit.price)
+
     except ValueError as err:
         print(f"Ошибочка вышла: {err}")
