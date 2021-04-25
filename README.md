@@ -38,7 +38,7 @@
 - ОС: ***Kubuntu 20.04***;
 - ```bash
 	$ python3 --version
-	 Python 3.8.5
+	Python 3.8.5
   ```
 - очумелые ручки программиста _Nikel_.
 
