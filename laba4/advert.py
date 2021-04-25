@@ -2,8 +2,13 @@ import json
 import keyword
 
 
+class RepresentationAdvert:
+    def __repr__(self):
+        return f'{self.title} | {self.price} ₽'
+
+
 class ColorizeMixin:
-    repr_color_code = 33    # Yellow
+    repr_color_code = 33  # Yellow
 
     def __repr__(self):
         return f'\033[1;{self.repr_color_code};40m' \
@@ -11,7 +16,7 @@ class ColorizeMixin:
                f'\033[0;1;1m'
 
 
-class Advert(ColorizeMixin):
+class Advert(ColorizeMixin, RepresentationAdvert):
     _price = 0
 
     def __setattr__(self, key, value):
@@ -38,12 +43,20 @@ def json_to_object(input_json: dict, unit_class: object) -> object:
     new_object = unit_class()
     for left_value, right_value in input_json.items():
         if isinstance(right_value, (list, tuple)):
-            new_object.__setattr__(left_value, [json_to_object(tmp, unit_class)
-                                                if isinstance(tmp, dict)
-                                                else tmp for tmp in right_value])
+            setattr(
+                new_object,
+                left_value,
+                [json_to_object(tmp, unit_class)
+                    if isinstance(tmp, dict)
+                    else tmp for tmp in right_value]
+            )
         else:
-            new_object.__setattr__(left_value, json_to_object(right_value, unit_class)
-                                   if isinstance(right_value, dict) else right_value)
+            setattr(
+                new_object,
+                left_value,
+                json_to_object(right_value, unit_class)
+                if isinstance(right_value, dict) else right_value
+            )
     return new_object
 
 
