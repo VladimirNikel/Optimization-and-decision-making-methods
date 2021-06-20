@@ -2,6 +2,9 @@ import os
 from time import time
 import csv
 import pandas
+import numpy
+import re
+from datetime import datetime
 
 
 def get_directory_path() -> str:
@@ -49,7 +52,7 @@ def get_window_size() -> int:
 
 def get_max_duration() -> int:
     """
-
+    function for getting the maximum amount of time between site visits
     """
     default_duration = 30
     message = "Введите пожалуйста максимальное кол-во минут между посещенными сайтами в разных сессиях: "
@@ -69,7 +72,7 @@ def calc_duration(func):
         time_to_start = time()
         result_func = func(*args, **kwargs)
         time_to_finish = time()
-        print(f"elapsed time is about {time_to_finish-time_to_start} seconds")
+        print(f"\ncompleted in about {time_to_finish - time_to_start} seconds")
         return result_func
 
     return decorated
@@ -77,45 +80,81 @@ def calc_duration(func):
 
 @calc_duration
 def prepare_train_set(ogs_path: str, session_length: int, window_size: int, max_duration: int):
-    "считываем файлы из директории __ogs_path__"
-    """собсна чтение"""
-
     """
-    # 1.8 на получение строк
-    # 12.6 на вывод всех строк
-    count_row = 0   # временно
+    function for processing files in a session
+    """
+    session_is_open = False
+    time_start_session = datetime(2021, 6, 17, 0, 10, 36)
+    data_headers = []
+    data_dataframe = []
+    reason_for_finish_previous_session = ""
+
+    "считываем файлы из директории __ogs_path__"
+    # 1.8s на получение строк
+    # 12.6s на вывод всех строк
+    # 34.92 на обработку и вывод строк согласно сессиям в виде print()
     for file_name in os.listdir(ogs_path):
+        reason_for_finish_previous_session = ""
         current_name_file = ogs_path + "/" + file_name
+        id_user = int(re.search('(\d\d*).csv$', file_name).group(1))
+
         # получен файл
         with open(current_name_file) as file:
             reader = csv.reader(file, delimiter=',')
+
+            if csv.Sniffer().has_header(file.read(1024)):
+                file.seek(0)        # обнаружены заголовки, но возвращаемся в начало файла
+                next(reader, None)  # отсечение первой строчки файла с заголовками
+            else:
+                file.seek(0)        # возвращаемся в начало файла
+            """можно оптимизировать оставив только 
+            next(reader, None)
+            при условии, что все файлы начинаются с заголовков
+            но я решил оставить данную проверку, на всякий случай"""
+
+            current_session_length = 0
+
             for row_file in reader:
                 # получена строчка из файла
-                print(row_file)
-                count_row += 1  # временно
+                datetime_row = datetime.strptime(row_file[0], '%Y-%m-%d %H:%M:%S')
+                site_row = row_file[1]
 
-    print(f"Было перебрано {count_row} строк")
-    
+                if not session_is_open:
+                    print(reason_for_finish_previous_session)
+                    session_is_open = True
+                    current_session_length = 0
+                    time_start_session = datetime_row
 
-    """
-    # 5.71 на получение строк из файлов
-    # 12.8 на вывод строк всех
-    count_row = 0  # временно
-    for file_name in os.listdir(ogs_path):
-        current_name_file = ogs_path + "/" + file_name
-        # получен файл
-        with open(current_name_file) as file:
-            df = pandas.read_csv(file)
-            for rows in df.itertuples():
-                count_row += 1
+                # условия останова
+                if session_is_open and current_session_length >= session_length:
+                    session_is_open = False
+                    reason_for_finish_previous_session = "-- новая сессия из-за того, что\n" \
+                                                         " - посетили session_length сайтов"
+                    data_headers.append('user_id')
+                    data_dataframe.append(id_user)
 
-    print(f"Было перебрано {count_row} строк")
+                if session_is_open and \
+                        ((datetime_row - time_start_session).total_seconds() / 60 >= max_duration):
+                    session_is_open = False
+                    reason_for_finish_previous_session = f"-- новая сессия из-за того, что\n" \
+                                                         f" - следующий сайт посещен больше чем через {max_duration}" \
+                                                         f" минут"
+                    data_headers.append('user_id')
+                    data_dataframe.append(id_user)
 
+                # тут делаем основную работу
+                if session_is_open:
+                    print(f"time: {datetime_row} & site: {site_row}")
+                    data_headers.append('site' + str(current_session_length+1).zfill(2))
+                    data_headers.append('time' + str(current_session_length+1).zfill(2))
+                    data_dataframe.append(site_row)
+                    data_dataframe.append(datetime_row)
+                    current_session_length += 1
 
-    "разбиваем строки на сессии"
-    "  Содержит максимум __session_length__"
-
-    ...
+            session_is_open = False
+            reason_for_finish_previous_session = "-- новая сессия из-за того, что\n - записи кончились"
+    print(reason_for_finish_previous_session)
+    #return pandas.DataFrame(numpy.array(data_dataframe), columns=numpy.array(data_headers))
 
 
 if __name__ == "__main__":
@@ -123,6 +162,5 @@ if __name__ == "__main__":
     sess_len = get_session_length()
     wind_size = get_window_size()
     maximum_duration = get_max_duration()
-    print()     # вывод пустой строки
 
     prepare_train_set(directory_path, sess_len, wind_size, maximum_duration)
