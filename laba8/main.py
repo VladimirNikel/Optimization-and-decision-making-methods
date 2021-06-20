@@ -2,7 +2,7 @@ import os
 from time import time
 import csv
 import pandas
-import numpy
+import numpy as np
 import re
 from datetime import datetime
 
@@ -87,20 +87,23 @@ def prepare_train_set(ogs_path: str, session_length: int, window_size: int, max_
     time_start_session = datetime(2021, 6, 17, 0, 10, 36)
     data_headers = []
     data_dataframe = []
-    reason_for_finish_previous_session = ""
+    #reason_for_finish_previous_session = ""
 
     "считываем файлы из директории __ogs_path__"
     # 1.8s на получение строк
     # 12.6s на вывод всех строк
     # 34.92 на обработку и вывод строк согласно сессиям в виде print()
+    # 450 секунд на вывод вместе с использование pandas.DataFrame (вместе с профилированием)
+    # 163 секунды - просто выполняя код из под python
     for file_name in os.listdir(ogs_path):
-        reason_for_finish_previous_session = ""
+        #reason_for_finish_previous_session = ""
         current_name_file = ogs_path + "/" + file_name
         id_user = int(re.search('(\d\d*).csv$', file_name).group(1))
 
         # получен файл
         with open(current_name_file) as file:
             reader = csv.reader(file, delimiter=',')
+            last_session = []
 
             if csv.Sniffer().has_header(file.read(1024)):
                 file.seek(0)        # обнаружены заголовки, но возвращаемся в начало файла
@@ -120,7 +123,7 @@ def prepare_train_set(ogs_path: str, session_length: int, window_size: int, max_
                 site_row = row_file[1]
 
                 if not session_is_open:
-                    print(reason_for_finish_previous_session)
+                    #print(reason_for_finish_previous_session)
                     session_is_open = True
                     current_session_length = 0
                     time_start_session = datetime_row
@@ -128,33 +131,42 @@ def prepare_train_set(ogs_path: str, session_length: int, window_size: int, max_
                 # условия останова
                 if session_is_open and current_session_length >= session_length:
                     session_is_open = False
-                    reason_for_finish_previous_session = "-- новая сессия из-за того, что\n" \
+                    """reason_for_finish_previous_session = "-- новая сессия из-за того, что\n" \
                                                          " - посетили session_length сайтов"
+                                                         """
                     data_headers.append('user_id')
                     data_dataframe.append(id_user)
 
                 if session_is_open and \
                         ((datetime_row - time_start_session).total_seconds() / 60 >= max_duration):
                     session_is_open = False
-                    reason_for_finish_previous_session = f"-- новая сессия из-за того, что\n" \
+                    """reason_for_finish_previous_session = f"-- новая сессия из-за того, что\n" \
                                                          f" - следующий сайт посещен больше чем через {max_duration}" \
                                                          f" минут"
+                                                         """
                     data_headers.append('user_id')
                     data_dataframe.append(id_user)
 
                 # тут делаем основную работу
                 if session_is_open:
-                    print(f"time: {datetime_row} & site: {site_row}")
+                    #print(f"time: {datetime_row} & site: {site_row}")
                     data_headers.append('site' + str(current_session_length+1).zfill(2))
                     data_headers.append('time' + str(current_session_length+1).zfill(2))
                     data_dataframe.append(site_row)
                     data_dataframe.append(datetime_row)
                     current_session_length += 1
 
+                    # реализация использования windows_size
+                    # область применения пока не понятна
+                    last_session.append([site_row, datetime_row])
+                    while len(last_session) > window_size:
+                        last_session.pop(0)
+
             session_is_open = False
-            reason_for_finish_previous_session = "-- новая сессия из-за того, что\n - записи кончились"
-    print(reason_for_finish_previous_session)
-    #return pandas.DataFrame(numpy.array(data_dataframe), columns=numpy.array(data_headers))
+            #reason_for_finish_previous_session = "-- новая сессия из-за того, что\n - записи кончились"
+
+    #print(reason_for_finish_previous_session)
+    return pandas.DataFrame(np.array([data_dataframe]), columns=data_headers)
 
 
 if __name__ == "__main__":
